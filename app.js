@@ -769,7 +769,7 @@ makeQuiz(qs("#historyQuiz .quiz-mount"), DATA.historyQuiz, {
 });
 
 /* ============================================================
-   GIGGLES — 100 reveal cards with filters + pagination
+   GIGGLES — reveal cards with filters + pagination
    ============================================================ */
 const CAT_EMOJI = { silly: "😜", funny: "😂", mind: "🤯" };
 const giggleState = {
@@ -841,6 +841,7 @@ moreBtn.addEventListener("click", () => {
   giggleState.shown += 12;
   renderGiggles();
 });
+qs('#giggleFilters [data-filter="all"]').textContent = `🌈 All ${DATA.giggles.length}`;
 renderGiggles();
 
 /* ---------- surprise modal ---------- */
