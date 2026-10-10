@@ -1033,6 +1033,164 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") surpriseModa
 })();
 
 /* ============================================================
+   STICKER SHOP — die-cut stickers drawn on canvas, downloadable as PNG
+   ============================================================ */
+const STICKER_COLORS = {
+  space: "#7c3aed", animals: "#ea580c", food: "#db2777",
+  school: "#0d9488", fun: "#d97706", play: "#2563eb"
+};
+const stickerState = {
+  filter: "all",
+  saved: new Set(store.get("sumanya_stickers_v1", []))
+};
+const stickerGrid = qs("#stickerGrid");
+const stickerImgs = new Map();
+const stickerExport = document.createElement("canvas");
+
+function loadStickerImg(code) {
+  if (!stickerImgs.has(code)) {
+    stickerImgs.set(code, new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = `assets/stickers/${code}.svg`;
+    }));
+  }
+  return stickerImgs.get(code);
+}
+
+/* draws one sticker (art + caption pill + white die-cut rim + soft shadow) into a square canvas */
+function drawSticker(canvas, size, img, s) {
+  const dpr = canvas === stickerExport ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = canvas.height = Math.round(size * dpr);
+  const ctx = canvas.getContext("2d");
+  const S = canvas.width;
+  const rim = S * 0.035;
+
+  /* 1. the coloured artwork on its own layer */
+  const art = document.createElement("canvas");
+  art.width = art.height = S;
+  const a = art.getContext("2d");
+  const E = S * 0.56;
+  a.drawImage(img, (S - E) / 2, S * 0.1, E, E);
+
+  let fontPx = S * 0.115;
+  a.font = `800 ${fontPx}px "Baloo 2", sans-serif`;
+  while (a.measureText(s.t).width > S * 0.78 && fontPx > S * 0.06) {
+    fontPx -= 1;
+    a.font = `800 ${fontPx}px "Baloo 2", sans-serif`;
+  }
+  const tw = a.measureText(s.t).width;
+  const ph = fontPx * 1.45, pw = tw + fontPx * 1.3;
+  const px = (S - pw) / 2, py = S * 0.7;
+  a.fillStyle = STICKER_COLORS[s.cat];
+  a.beginPath();
+  a.roundRect(px, py, pw, ph, ph / 2);
+  a.fill();
+  a.fillStyle = "#fff";
+  a.textAlign = "center";
+  a.textBaseline = "middle";
+  a.fillText(s.t, S / 2, py + ph / 2 + fontPx * 0.06);
+
+  /* 2. white silhouette = the artwork stamped in a ring, then flooded white */
+  const cut = document.createElement("canvas");
+  cut.width = cut.height = S;
+  const c = cut.getContext("2d");
+  for (let deg = 0; deg < 360; deg += 15) {
+    const r = deg * Math.PI / 180;
+    c.drawImage(art, Math.cos(r) * rim, Math.sin(r) * rim);
+  }
+  c.globalCompositeOperation = "source-in";
+  c.fillStyle = "#fff";
+  c.fillRect(0, 0, S, S);
+
+  /* 3. compose: shadow, white rim, artwork */
+  ctx.clearRect(0, 0, S, S);
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, .35)";
+  ctx.shadowBlur = S * 0.03;
+  ctx.shadowOffsetY = S * 0.012;
+  ctx.drawImage(cut, 0, 0);
+  ctx.restore();
+  ctx.drawImage(art, 0, 0);
+}
+
+function stickerSlug(s) {
+  return s.t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+async function downloadSticker(s, i, btn) {
+  try {
+    const img = await loadStickerImg(s.e);
+    drawSticker(stickerExport, 512, img, s);
+    const blob = await new Promise(r => stickerExport.toBlob(r, "image/png"));
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `sumanya-sticker-${stickerSlug(s)}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    sfx.pop();
+    if (!stickerState.saved.has(i)) {
+      stickerState.saved.add(i);
+      store.set("sumanya_stickers_v1", [...stickerState.saved]);
+      addStars(1, btn);
+    }
+    btn.classList.add("saved");
+    btn.textContent = "Saved! ✅";
+  } catch (e) {
+    console.warn("sticker download failed", e);
+    btn.textContent = "Try again 🔁";
+  }
+}
+
+function renderStickers() {
+  stickerGrid.innerHTML = "";
+  DATA.stickers.forEach((s, i) => {
+    if (stickerState.filter !== "all" && s.cat !== stickerState.filter) return;
+    const card = document.createElement("figure");
+    card.className = "sticker-card";
+    const saved = stickerState.saved.has(i);
+    card.innerHTML = `
+      <canvas class="sticker-canvas" role="img"></canvas>
+      <button class="sticker-btn${saved ? " saved" : ""}">${saved ? "Saved! ✅" : "Download ⬇️"}</button>`;
+    const canvas = qs("canvas", card);
+    canvas.setAttribute("aria-label", `${s.t} sticker`);
+    loadStickerImg(s.e).then(img => drawSticker(canvas, 180, img, s)).catch(() => {});
+    qs(".sticker-btn", card).addEventListener("click", e => downloadSticker(s, i, e.currentTarget));
+    stickerGrid.appendChild(card);
+  });
+}
+
+qs("#stickerFilters").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  qsa("#stickerFilters .chip").forEach(c => c.classList.toggle("is-on", c === chip));
+  stickerState.filter = chip.dataset.filter;
+  renderStickers();
+});
+qs('#stickerFilters [data-filter="all"]').textContent = `🌈 All ${DATA.stickers.length}`;
+qs("#stickerTotal").textContent = DATA.stickers.length;
+
+/* only fetch the 100 sticker files once the shop is close to the screen (and the font is ready) */
+let stickersStarted = false;
+function startStickers() {
+  if (stickersStarted) return;
+  stickersStarted = true;
+  document.fonts.load('800 20px "Baloo 2"').catch(() => {}).finally(renderStickers);
+}
+if ("IntersectionObserver" in window) {
+  const stickerObs = new IntersectionObserver(entries => {
+    if (entries.some(en => en.isIntersecting)) { stickerObs.disconnect(); startStickers(); }
+  }, { rootMargin: "800px 0px" });
+  stickerObs.observe(qs("#stickers"));
+} else {
+  startStickers();
+}
+
+/* ============================================================
    NAV, SCROLL EFFECTS, ASTRONAUT
    ============================================================ */
 qsa("[data-nav]").forEach(a => {
@@ -1051,7 +1209,7 @@ qs("#scrollDown").addEventListener("click", () => {
 });
 
 /* active nav highlight */
-const sectionIds = ["space", "giggles", "history"];
+const sectionIds = ["space", "giggles", "history", "stickers"];
 if ("IntersectionObserver" in window) {
   const navObs = new IntersectionObserver(entries => {
     entries.forEach(en => {

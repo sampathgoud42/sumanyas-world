@@ -24,6 +24,7 @@
       <a href="#space" data-nav><span class="nav-emoji">🌌</span><span class="nav-word">Space</span></a>
       <a href="#giggles" data-nav><span class="nav-emoji">😂</span><span class="nav-word">Giggles</span></a>
       <a href="#history" data-nav><span class="nav-emoji">🏛️</span><span class="nav-word">History</span></a>
+      <a href="#stickers" data-nav><span class="nav-emoji">🎨</span><span class="nav-word">Stickers</span></a>
     </nav>
     <div class="topbar-right">
       <button class="chip-btn" id="soundToggle" aria-label="Toggle sounds" title="Sounds on/off">🔊</button>
@@ -222,6 +223,31 @@
         </div>
         <div class="wcf-mount" id="wcfMount"></div>
       </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">🎨 · 🦄 · 🍕 · 🦄 · 🎨</div>
+
+    <!-- ======= SECTION 4: STICKERS ======= -->
+    <section class="section section-stickers" id="stickers">
+      <div class="section-head rise">
+        <span class="section-badge badge-pink">Free Gifts</span>
+        <h2>🎨 The Sticker Shop</h2>
+        <p><span id="stickerTotal">100</span> free stickers! Tap <b>Download</b> to save one for your notebook, tablet or chats.</p>
+      </div>
+
+      <div class="filter-chips sticker-filters rise" id="stickerFilters" role="group" aria-label="Filter stickers">
+        <button class="chip is-on" data-filter="all">🌈 All</button>
+        <button class="chip" data-filter="space">🚀 Space</button>
+        <button class="chip" data-filter="animals">🐼 Animals</button>
+        <button class="chip" data-filter="food">🍕 Yummy</button>
+        <button class="chip" data-filter="school">📚 School</button>
+        <button class="chip" data-filter="fun">😎 Feelings</button>
+        <button class="chip" data-filter="play">⚽ Play</button>
+      </div>
+
+      <div class="sticker-grid" id="stickerGrid"></div>
+
+      <p class="sticker-credit">Sticker art: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> by Twitter, Inc. and contributors, used under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY 4.0</a>. Stickers made for Sumanya's World.</p>
     </section>
   </main>
 
