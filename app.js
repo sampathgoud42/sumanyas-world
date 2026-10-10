@@ -248,14 +248,14 @@ const scene3d = { ok: false, renderOnce: () => {} };
 function initSolarSystem() {
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
   } catch (e) {
     console.warn("WebGL unavailable, using poster fallback", e);
     canvas.style.display = "none";
     stageEl.style.background = "url('assets/solar-poster.webp') center/cover no-repeat, #0b1026";
     return;
   }
-  renderer.setClearColor(0x0b1026, 1);
+  renderer.setClearColor(0x0b1026, 0);   /* transparent: the hero photo backdrop shows through */
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 2, 0.1, 2000);
@@ -1039,7 +1039,7 @@ qsa("[data-nav]").forEach(a => {
   });
 });
 qs("#scrollDown").addEventListener("click", () => {
-  const target = qs("#space");
+  const target = qs("#journey");
   window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 62, behavior: NOANIM ? "auto" : "smooth" });
 });
 
