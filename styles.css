@@ -734,6 +734,8 @@ h1, h2, h3 { font-family: var(--font-head); line-height: 1.15; }
 .chip:hover { transform: translateY(-2px); }
 .chip:active { transform: scale(.94); }
 .chip.is-on { background: linear-gradient(135deg, var(--orange), var(--pink2)); border-color: transparent; color: #fff; }
+.chip-new { border-color: rgba(251, 191, 36, .6); color: #fde68a; }
+.chip-new.is-on { background: linear-gradient(135deg, var(--gold), var(--orange2)); color: #2a1a00; }
 
 .giggle-grid {
   display: grid;
@@ -763,6 +765,17 @@ h1, h2, h3 { font-family: var(--font-head); line-height: 1.15; }
   border-radius: 999px;
   padding: 3px 10px;
   color: var(--ink-dim);
+}
+
+.giggle-new {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: .7rem;
+  letter-spacing: .06em;
+  color: #2a1a00;
+  background: linear-gradient(135deg, var(--gold), var(--orange));
+  border-radius: 999px;
+  padding: 2px 9px;
 }
 
 .giggle-cat { font-size: 1.05rem; margin-left: auto; }

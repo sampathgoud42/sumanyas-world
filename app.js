@@ -780,10 +780,13 @@ const giggleState = {
 const giggleGrid = qs("#giggleGrid");
 const moreBtn = qs("#moreGiggles");
 
+const isNewGiggle = i => i >= DATA.giggleNewFrom;
+
 function giggleList() {
   return DATA.giggles
     .map((g, i) => ({ ...g, i }))
-    .filter(g => giggleState.filter === "all" || g.cat === giggleState.filter);
+    .filter(g => giggleState.filter === "all"
+      || (giggleState.filter === "new" ? isNewGiggle(g.i) : g.cat === giggleState.filter));
 }
 
 function renderGiggles() {
@@ -796,6 +799,7 @@ function renderGiggles() {
     card.innerHTML = `
       <div class="giggle-top">
         <span class="giggle-num">#${g.i + 1}</span>
+        ${isNewGiggle(g.i) ? '<span class="giggle-new">✨ NEW</span>' : ""}
         <span class="giggle-cat" title="${g.cat}">${CAT_EMOJI[g.cat]}</span>
       </div>
       <p class="giggle-q">${g.q}</p>
@@ -842,6 +846,9 @@ moreBtn.addEventListener("click", () => {
   renderGiggles();
 });
 qs('#giggleFilters [data-filter="all"]').textContent = `🌈 All ${DATA.giggles.length}`;
+qs('#giggleFilters [data-filter="new"]').textContent =
+  `✨ Newly Added ${DATA.giggles.length - DATA.giggleNewFrom}`;
+qs("#giggleTotal").textContent = DATA.giggles.length;
 renderGiggles();
 
 /* ---------- surprise modal ---------- */

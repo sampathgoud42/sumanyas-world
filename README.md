@@ -25,3 +25,4 @@ A kids' site for curious 4th graders: a 3D solar system, space and history quizz
 Add entries to the `giggles` array in `data.js` as `{ cat: "silly" | "funny" | "mind", q: "...", a: "..." }`.
 Always append to the end: the site remembers which cards a kid has revealed by their position in the list, so reordering would mark the wrong cards as revealed.
 The "All" filter count updates on its own.
+To spotlight a new batch in the "✨ Newly Added" filter, set `giggleNewFrom` in `data.js` to the number of giggles that existed before the batch (the count on the "All" chip before you added it).

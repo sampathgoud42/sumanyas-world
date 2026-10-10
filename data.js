@@ -365,6 +365,10 @@ window.SUMANYA_DATA = {
       why: "3... 2... 1... LIFTOFF! (Splashdown is when a capsule lands in the ocean at the end.)" }
   ],
 
+  /* giggles from this index onward show in the "Newly Added" filter —
+     move it to the old giggles.length when appending the next batch */
+  giggleNewFrom: 200,
+
   /* ---------- 328 Giggle questions (silly / funny / mind-bending) ---------- */
   giggles: [
     /* --- SILLY (1–35) --- */
